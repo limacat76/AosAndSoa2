@@ -1,5 +1,11 @@
 #include <iostream>
+#include <cmath>
+#ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <emmintrin.h>
+#include <mmintrin.h>
+#endif
 #include <chrono>
 #include <string>
 
@@ -100,4 +106,7 @@ int main() {
 	printTime("Aos", aosStart, aosFinish);
 	printTime("Soa", soaStart, soaFinish);
 
+	delete[] rootsAos;
+	delete[] e;
+	delete[] roots;
 }
