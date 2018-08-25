@@ -1,13 +1,11 @@
 #include <iostream>
 #include <cmath>
-#ifdef _MSC_VER
-#include <intrin.h>
-#else
-#include <emmintrin.h>
-#include <mmintrin.h>
-#endif
 #include <chrono>
 #include <string>
+
+// SSE Intrinsics
+#include <emmintrin.h>
+#include <mmintrin.h>
 
 using std::chrono::system_clock;
 
