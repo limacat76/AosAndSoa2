@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <cmath>
 #include <chrono>
 #include <string>
@@ -114,12 +115,40 @@ int main() {
 	printTime("Soa", soaStart, soaFinish);
 
 	int different = 0;
+
+	const float epsilon = 0.0001; //std::numeric_limits<float>::epsilon();
+	const bool log_and_break = false;
 	for (int i = 0; i < count; i++) {
 		float x = roots[i];
 		float y = rootsAos[i];
-		if (!(std::isnan(x) && std::isnan(y)) && x != y) {
+		bool add = false;
+		if (std::isnan(x)) {
+			if(!std::isnan(x)) {
+				add = true;
+			}
+		} else if ( fabs(x - y) > ((fabs(x) < fabs(y) ? fabs(y) : fabs(x)) * epsilon)) {
+			add = true;
+		}
+		if (log_and_break) {
+			std::cout << ((fabs(x) < fabs(y) ? fabs(y) : fabs(x)) * epsilon) << "\n";	
+			std::cout << std::numeric_limits<float>::epsilon() << "\n";
+		}
+
+		if (add) {
+			if (log_and_break) {
+			std::cout.precision(std::numeric_limits<float>::max_digits10);
+			std::cout << "epsilon  " << std::numeric_limits<float>::epsilon() << "\n";
+			std::cout << "delta    " << fabs(x - y) << "\n";
+			std::cout << "depsilon " << ((fabs(x) < fabs(y) ? fabs(y) : fabs(x)) * epsilon) << "\n";
+			std::cout << "test     " << 
+				( fabs(x - y) <= ( (fabs(x) < fabs(y) ? fabs(y) : fabs(x)) * epsilon) )
+				  << "\n";
 			std::cout << x << ":" << y << "\n";
+			}
 			different++;
+			if (log_and_break) {
+			break;
+			}
 		}
 	}
 	std::cout << "there were " << different << " differences between the 2 algorithms\n";
