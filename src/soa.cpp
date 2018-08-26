@@ -11,7 +11,9 @@ using std::chrono::system_clock;
 
 struct Quadratic {
 public:
-	float a, b, c;
+	float a;
+	float b;
+	float c;
 };
 
 struct SoAQuadratic {
@@ -19,7 +21,20 @@ public:
 	float a[1 << 24];
 	float b[1 << 24];
 	float c[1 << 24];
-} soaE;
+};
+
+struct SoAQuadratic2 {
+	float* a;
+	float* b;
+	float* c;
+	SoAQuadratic2() : a(new float[1 << 24]),
+		b(new float[1 << 24]),
+		c(new float[1 << 24]) {
+		;
+	}
+};
+
+
 
 void printTime(const std::string& what, system_clock::time_point start, system_clock::time_point finish) {
 	std::cout << what << " took "
@@ -76,6 +91,8 @@ int main() {
 
 	__m128 A, B, C, tmpA, tmpB;
 	__m128 FOURS = { 4.0f, 4.0f, 4.0f, 4.0f };
+
+	SoAQuadratic2 soaE;
 
 	for (int i = 0; i < count; i += 4) {
 		A = _mm_loadu_ps(&soaE.a[i]);
