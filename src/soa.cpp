@@ -17,22 +17,20 @@ public:
 };
 
 struct SoAQuadratic {
-public:
-	float a[1 << 24];
-	float b[1 << 24];
-	float c[1 << 24];
-};
-
-struct SoAQuadratic2 {
 	float* a;
 	float* b;
 	float* c;
-	SoAQuadratic2() : a(new float[1 << 24]),
-		b(new float[1 << 24]),
-		c(new float[1 << 24]) {
+	SoAQuadratic(int size) : a(new float[size]),
+		b(new float[size]),
+		c(new float[size]) {
 		;
 	}
-};
+	~SoAQuadratic() {
+		delete[] a;
+		delete[] b;
+		delete[] c;
+	}
+ };
 
 
 
@@ -41,6 +39,7 @@ void printTime(const std::string& what, system_clock::time_point start, system_c
 		<< std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count()
 		<< "us.\n";
 }
+
 
 int main() {
 	system_clock::time_point start;
@@ -92,7 +91,7 @@ int main() {
 	__m128 A, B, C, tmpA, tmpB;
 	__m128 FOURS = { 4.0f, 4.0f, 4.0f, 4.0f };
 
-	SoAQuadratic2 soaE;
+	SoAQuadratic soaE(count);
 
 	for (int i = 0; i < count; i += 4) {
 		A = _mm_loadu_ps(&soaE.a[i]);
