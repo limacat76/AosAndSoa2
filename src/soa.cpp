@@ -48,22 +48,31 @@ int main() {
 	system_clock::time_point aosStart;
 	system_clock::time_point aosFinish;
 
-	start = system_clock::now();
-	aosStart = start;
+	system_clock::time_point soaStart;
+	system_clock::time_point soaFinish;
+
 	const int count = 1 << 24;
 	Quadratic* e = new Quadratic[count]; // Array of Structures
+	SoAQuadratic soaE(count); // Struct of Arrays
 	float* roots = new float[count]; // this will be our roots
+	float* rootsAos = new float[count]; // this will be our roots
+
+	start = system_clock::now();
 
 	// Set up random quadratics
 	for (int i = 0; i < count; i++) {
 		e[i].a = (rand() % 100) - 50;
+		soaE.a[i] = e[i].a;
 		e[i].b = (rand() % 100) - 50;
+		soaE.b[i] = e[i].b;
 		e[i].c = (rand() % 100) - 50;
+		soaE.c[i] = e[i].c;
 	}
 	finish = system_clock::now();
 	printTime("Construction", start, finish);
 
 	start = system_clock::now();
+	aosStart = start;
 	for (int i = 0; i < count; i++) {
 		roots[i] = (-e[i].b + sqrt(e[i].b*e[i].b - 4 * (e[i].a
 			* e[i].c))) / (2.0f*e[i].a);
@@ -72,27 +81,11 @@ int main() {
 	aosFinish = finish;
 	printTime("Calculation", start, finish);
 
-	system_clock::time_point soaStart;
-	system_clock::time_point soaFinish;
 	start = system_clock::now();
 	soaStart = start;
-	// Set up random quadratics
-	for (int i = 0; i < count; i++) {
-		e[i].a = (rand() % 100) - 50;
-		e[i].b = (rand() % 100) - 50;
-		e[i].c = (rand() % 100) - 50;
-	}
-	float* rootsAos = new float[count]; // this will be our roots
-
-	finish = system_clock::now();
-	printTime("Construction", start, finish);
-	start = system_clock::now();
 
 	__m128 A, B, C, tmpA, tmpB;
 	__m128 FOURS = { 4.0f, 4.0f, 4.0f, 4.0f };
-
-	SoAQuadratic soaE(count);
-
 	for (int i = 0; i < count; i += 4) {
 		A = _mm_loadu_ps(&soaE.a[i]);
 		B = _mm_loadu_ps(&soaE.b[i]);
@@ -120,7 +113,17 @@ int main() {
 	printTime("Aos", aosStart, aosFinish);
 	printTime("Soa", soaStart, soaFinish);
 
+	int different = 0;
+	for (int i = 0; i < count; i++) {
+		float x = roots[i];
+		float y = rootsAos[i];
+		if (!(std::isnan(x) && std::isnan(y)) && x != y) {
+			std::cout << x << ":" << y << "\n";
+			different++;
+		}
+	}
+	std::cout << "there were " << different << " differences between the 2 algorithms\n";
 	delete[] rootsAos;
-	delete[] e;
 	delete[] roots;
+	delete[] e;
 }
